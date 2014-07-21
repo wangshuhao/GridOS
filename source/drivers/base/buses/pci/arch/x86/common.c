@@ -1,5 +1,5 @@
 #include <ddk/types.h>
-#include <ddk/log.h>
+#include <ddk/debug.h>
 #include <ddk/io.h>
 #include <ddk/irq.h>
 #include <ddk/resource.h>
@@ -8,12 +8,12 @@
 #include <ddk/slab.h>
 #include <ddk/pci/pci_regs.h>
 #include <ddk/pci/class.h>
+#include <ddk/string.h>
 
 #include <FIRMWARE/dmi/dmi.h>
 
 #include <compiler.h>
 #include <list.h>
-#include <string.h>
 #include <errno.h>
 
 #include <pci.h>
@@ -465,6 +465,7 @@ struct pci_bus * __devinit pcibios_scan_root(int busnum)
 
 void __init pcibios_set_cache_line_size(void)
 {
+	//TODO, get the cacheline size from cpu
 	pci_dfl_cache_line_size = 32 >> 2;
 	printk(KERN_DEBUG "PCI: Unknown cacheline size. Setting to 32 bytes\n");
 }

@@ -15,10 +15,10 @@
 #define KE_LOCK_H
 
 #include <types.h>
-typedef struct ke_spinlock
+struct ke_spinlock
 {
-	unsigned long dummy;
-} spinlock_t;
+	unsigned long lock;
+};
 
 /**
 	@brief 自旋锁一个对象
@@ -82,6 +82,7 @@ void ke_spin_lock_irq(struct ke_spinlock * lock);
 	@brief 解锁 + 开中断
 */
 void ke_spin_unlock_irq(struct ke_spinlock * lock);
+
 
 #endif
 

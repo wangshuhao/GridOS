@@ -10,7 +10,6 @@
 #define _PCI_H_
 #include <list.h>
 
-#include <kernel/ke_lock.h>
 #include <kernel/ke_atomic.h>
 
 #include <ddk/types.h>
@@ -108,6 +107,11 @@ struct pci_fixup {
 #define DEFINE_PCI_DEVICE_TABLE(_table) \
 	const struct pci_device_id _table[] __devinitconst
 
+/* This defines the direction arg to the DMA mapping routines. */
+#define PCI_DMA_BIDIRECTIONAL	0
+#define PCI_DMA_TODEVICE	1
+#define PCI_DMA_FROMDEVICE	2
+#define PCI_DMA_NONE		3
 
 /**
 	@brief PCI资源编号
@@ -185,7 +189,7 @@ void pci_unregister_driver(struct ddk_pci_driver *drv);
 /**
 	@brief 开启PCI设备
 */
-int pci_enable_device(struct pci_dev *dev);
+DLLEXPORT int pci_enable_device(struct pci_dev *dev);
 
 /**
 	@brief 停止PCI设备
@@ -205,23 +209,17 @@ int pci_set_dma_mask(struct pci_dev *dev, u64 mask);
 /**
 	@brief 设置PCI设备的consistent DMA地址长度
 */
-int pci_set_consistent_dma_mask(struct pci_dev *dev, u64 mask);
+DLLEXPORT int pci_set_consistent_dma_mask(struct pci_dev *dev, u64 mask);
 
 /**
 	@brief 使能PCI设备
 */
-int pcim_enable_device(struct pci_dev *pdev);
+DLLEXPORT int pcim_enable_device(struct pci_dev *pdev);
 
 /**
 	@brief <还未实现>有用吗？
 */
 void pcim_pin_device(struct pci_dev *pdev);
-
-/**
-	@brief msi功能的使能
-*/
-int pci_enable_msi_block(struct pci_dev *dev, unsigned int nvec);
-#define pci_enable_msi(pdev)	pci_enable_msi_block(pdev, 1)
 
 /**
 	@brief 还未实现
@@ -251,6 +249,31 @@ void pci_set_master(struct pci_dev *dev);
 		成功则返回匹配的设备，否则返回NULL
 */
 struct pci_dev * pci_get_device(unsigned int vendor, unsigned int device, struct pci_dev *from);
+
+/**
+	@brief 设置设备的cache属性
+ 
+	@param[in] dev 到底要设置哪个pci设备的属性
+ 
+	@return 成功返回0，否则返回错误码
+*/
+DLLEXPORT int pci_set_mwi(struct pci_dev *dev);
+
+DLLEXPORT void pci_clear_mwi(struct pci_dev *dev);
+
+/**
+	@brief 为一个pci设备保留所有的设备资源
+ 
+	一般来说，pci设备驱动保留了设备资源用于对其映射访问
+ 
+	@brief dev 要操作的pci设备对象
+	@brief res_name 保留留者的名字
+ 
+	@return 成功返回0，否则返回错误码
+*/
+DLLEXPORT int pci_request_regions(struct pci_dev *dev, const char *res_name);
+
+DLLEXPORT void pci_release_regions(struct pci_dev *pdev);
 
 /**
 	@brief 映射PCI地址

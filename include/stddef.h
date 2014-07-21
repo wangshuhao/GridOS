@@ -36,6 +36,12 @@
 		_max1 > _max2 ? _max1 : _max2; })
 #endif
 
+/*  获取对其的长度 */
+#define ALIGN(x, a)				__ALIGN__((x), (a))
+#define __ALIGN__(x, a)			__ALIGN__MASK(x, (typeof(x))(a) - 1)
+#define __ALIGN__MASK(x, mask)	(((x) + (mask)) & ~(mask))
+#define PTR_ALIGN(p, a)		((typeof(p))ALIGN((unsigned long)(p), (a)))
+
 #endif
 
 /** @} */
